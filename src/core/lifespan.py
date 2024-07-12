@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from core.settings import settings
 from database.helper import db
 from database.tables import create_table_user
-from src.core.routers import register_routers
+from core.routers import register_routers
 
 
 @asynccontextmanager
