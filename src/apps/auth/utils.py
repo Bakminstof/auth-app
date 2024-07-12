@@ -22,6 +22,7 @@ auth_cookie = APIKeyCookie(name=settings.auth.cookie_key)
 
 
 async def check_exists_user(username: str, email: str, con: Connection) -> None:
+    """Проверка существования пользователя по имени ил почте"""
     if (username and await get_user_by_name(con, username)) or (
         email and await get_user_by_email(con, username)
     ):
@@ -32,6 +33,7 @@ async def check_exists_user(username: str, email: str, con: Connection) -> None:
 
 
 async def register_user(user_create: UserCreate, con: Connection) -> UserRead:
+    """Регистрация нового пользователя"""
     password_helper = PasswordHelper()
     password_helper.check_created_password(user_create)
 
@@ -49,6 +51,7 @@ async def cookie_login(
     access_key: Annotated[str, Depends(auth_cookie)],
     con: Annotated[Connection, Depends(get_connection)],
 ) -> UserRead:
+    """Авторизация пользователя по COOKIE"""
     payload = decode_jwt(access_key)
     user_id = payload.get("sub")
 
@@ -67,6 +70,7 @@ def set_auth_cookie(
     user: UserRead,
     response: Response,
 ) -> None:
+    """Назначение сессии при помощи JWT и COOKIE"""
     jwt_payload = {
         "sub": user.id,
     }
@@ -85,6 +89,7 @@ def encode_jwt(
     algorithm: str | None = None,
     token_age: int | None = None,
 ) -> str:
+    """Создание JWT токена"""
     if private_key is None:
         private_key = settings.auth.private_key.read_text(
             encoding=settings.base_encoding,
@@ -109,6 +114,7 @@ def decode_jwt(
     public_key: str | None = None,
     algorithm: str | None = None,
 ) -> dict:
+    """Чтение JWT токена"""
     if public_key is None:
         public_key = settings.auth.public_key.read_text(encoding=settings.base_encoding)
 

@@ -12,6 +12,9 @@ class DBHelper:
         self.__db_path = db_path
 
     async def connect(self) -> None:
+        if not self.__db_path:
+            raise RuntimeError("Database not initialized")
+
         self.__connection = await connect(self.__db_path)
 
     async def close(self) -> None:
@@ -23,6 +26,7 @@ class DBHelper:
     def connection(self) -> Connection:
         if self.__connection is None:
             raise RuntimeError("Database not connect")
+
         return self.__connection
 
 

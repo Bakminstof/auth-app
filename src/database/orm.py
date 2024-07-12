@@ -4,6 +4,7 @@ from core.models import UserRead
 
 
 async def _get_user(con: Connection, stmt: str, param: str | int) -> UserRead | None:
+    """Получение пользователя из базы данных по параметру"""
     async with con.cursor() as cursor:  # type: Cursor
         res = await cursor.execute(stmt, [param])
         res = await res.fetchone()
@@ -20,6 +21,8 @@ async def get_user_by_name(
     name: str,
     is_active: bool = True,
 ) -> UserRead | None:
+    """Получение пользователя по `name`. Если активен флаг `is_active`,
+    будет возвращён только активный пользователь"""
     stmt = f"""
         SELECT user.id, user.username, user.email, user.status 
         FROM user
@@ -33,6 +36,8 @@ async def get_user_by_id(
     user_id: int,
     is_active: bool = True,
 ) -> UserRead | None:
+    """Получение пользователя по `user_id`. Если активен флаг `is_active`,
+    будет возвращён только активный пользователь"""
     stmt = f"""
         SELECT user.id, user.username, user.email, user.status 
         FROM user
@@ -46,6 +51,8 @@ async def get_user_by_email(
     email: str,
     is_active: bool = True,
 ) -> UserRead | None:
+    """Получение пользователя по `email`. Если активен флаг `is_active`,
+    будет возвращён только активный пользователь"""
     stmt = f"""
         SELECT user.id, user.username, user.email, user.status 
         FROM user
@@ -58,6 +65,8 @@ async def get_users_list(
     con: Connection,
     is_active: bool = True,
 ) -> list[UserRead]:
+    """Получение всех пользователй. Если активен флаг `is_active`,
+    будут возвращены только активные пользователи"""
     stmt = f"""
         SELECT user.id, user.username, user.email, user.status 
         FROM user
@@ -76,6 +85,7 @@ async def get_users_list(
 
 
 async def create_user(con: Connection, user_create_data: dict) -> bool:
+    """Создание пользователя"""
     stmt = """
         INSERT INTO user (email, username, status, hashed_password) VALUES (?, ?, ?, ?);
     """
@@ -96,6 +106,7 @@ async def create_user(con: Connection, user_create_data: dict) -> bool:
 
 
 async def update_user(con: Connection, user_id: int, user_update_data: dict) -> bool:
+    """Обновление данных пользователя по определённым полям"""
     user_update_data_fields = list(user_update_data.keys())
 
     setter = ", ".join([f"{field} = ?" for field in user_update_data_fields])
@@ -119,6 +130,8 @@ async def update_user(con: Connection, user_id: int, user_update_data: dict) -> 
 
 
 async def delete_user(con: Connection, user_id: int, soft: bool = True) -> bool:
+    """Удаление пользователя из базы данных. Если активен флаг `soft`,
+    тогда вместо удаления происходит смена статуса на `неактивный`"""
     if soft:
         stmt = """
             UPDATE user 

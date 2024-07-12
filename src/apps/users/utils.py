@@ -13,6 +13,7 @@ from database.utils import get_connection
 async def get_all_users(
     connection: Annotated[Connection, Depends(get_connection)],
 ) -> list[UserRead]:
+    """Получить всех активных пользователей"""
     return await get_users_list(connection)
 
 
@@ -21,6 +22,7 @@ async def patch_user(
     user_update: UserUpdate,
     con: Connection,
 ) -> UserRead:
+    """Обновление данных пользователя по ID"""
     if not await get_user_by_id(con, user_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -46,6 +48,7 @@ async def patch_user(
 
 
 async def remove_user(user_id: int, con: Connection, soft: bool = True) -> None:
+    """Удаление пользователя по ID"""
     if not await get_user_by_id(con, user_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
